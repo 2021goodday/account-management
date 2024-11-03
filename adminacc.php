@@ -102,6 +102,27 @@
         color: #721c24;
         border: 1px solid #f5c6cb;
     }
+
+    /* Modal styling */
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 300px;
+        margin: 100px auto;
+        text-align: center;
+    }
+
+    #deactivateModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
 </style>
 
 <div class="container mt-4">
@@ -125,19 +146,16 @@
 
         <!-- Update Profile Information Form -->
         <form action="<?= base_url('user/updateAccount') ?>" method="post">
-            <!-- Update Email -->
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" value="admin@example.com" required>
             </div>
 
-            <!-- Update Phone Number -->
             <div class="form-group">
                 <label for="phone">Phone Number:</label>
                 <input type="text" id="phone" name="phone" value="+63 9123456789">
             </div>
 
-            <!-- Update Password Section -->
             <div class="form-group-inline">
                 <div class="form-group">
                     <label for="password">New Password:</label>
@@ -149,7 +167,6 @@
                 </div>
             </div>
 
-            <!-- Save Button -->
             <div class="form-group">
                 <button type="submit">Update Account</button>
             </div>
@@ -160,10 +177,47 @@
         <!-- Account Deactivation Section -->
         <div class="text-danger">
             <h4>Danger Zone</h4>
-            <p>If you deactivate your account, all your information will be permanently deleted and you will not be able to access the admin panel anymore.</p>
+            <p>If you deactivate your account, you will lose access to the admin panel and your information will be temporarily inaccessible. You can reactivate your account at any time by logging in again.</p>
         </div>
-        <form action="<?= base_url('admin/deactivateAccount') ?>" method="post">
-            <button type="submit" class="danger-button">Deactivate Account</button>
+        <form id="deactivateForm" action="<?= base_url('user/deactivateAccount') ?>" method="post">
+            <button type="button" class="danger-button" onclick="confirmDeactivation()">Deactivate Account</button>
         </form>
+
+        <!-- Deactivation Confirmation Modal -->
+        <div id="deactivateModal">
+            <div class="modal-content">
+                <h4>Confirm Account Deactivation</h4>
+                <p>Please enter your password to confirm deactivation.</p>
+                <input type="password" id="confirmPassword" required>
+                <button onclick="submitDeactivationForm()" class="danger-button">Confirm</button>
+                <button type="button" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function confirmDeactivation() {
+    document.getElementById('deactivateModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('deactivateModal').style.display = 'none';
+}
+
+function submitDeactivationForm() {
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    
+    if (confirmPassword) {
+        let passwordInput = document.createElement("input");
+        passwordInput.type = "hidden";
+        passwordInput.name = "password";
+        passwordInput.value = confirmPassword;
+
+        document.getElementById("deactivateForm").appendChild(passwordInput);
+        document.getElementById("deactivateForm").submit();
+    } else {
+        alert("Please enter your password to confirm.");
+    }
+}
+</script>
