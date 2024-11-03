@@ -11,7 +11,7 @@ class AdminAcc extends BaseController
         return view('adminacc');
     }
 
-    // [adrielle] method to handle form data processing in Account Management
+    // adrielle - method to handle form data processing in Account Management
     public function updateAccount()
     {
         // Load the model
@@ -59,4 +59,41 @@ class AdminAcc extends BaseController
         // Redirect back with success message
         return redirect()->back()->with('success', 'Account updated successfully');
     }
+
+
+    // adrielle - method for account deactivation
+    public function deactivateAccount()
+    {
+        // Load the model
+        $adminModel = new AccountManagementModel();
+        
+        // Get the user ID from session
+        $userId = session()->get('user_id');
+    
+        // Get password confirmation input
+        $password = $this->request->getPost('password');
+    
+        // Fetch the user’s data
+        $user = $adminModel->find($userId);
+    
+        // Verify the entered password
+        if ($user && password_verify($password, $user['password'])) {
+            // Set `deactivated` to true (1)
+            $adminModel->update($userId, ['deactivated' => 1]);
+    
+            // Set the success message in session
+            session()->setFlashdata('message', 'Your account has been successfully deactivated.');
+    
+            // Destroy session after setting flashdata
+            session()->destroy();
+    
+            // Redirect to home page
+            return redirect()->to('/');
+        } else {
+            // Incorrect password handling
+            return redirect()->back()->with('error', 'Incorrect password. Please try again.');
+        }
+    }
+    
+
 }
