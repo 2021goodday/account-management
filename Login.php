@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Controllers;
 
 use App\Models\SignupModel;
@@ -14,13 +13,14 @@ use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class Login extends BaseController
 {
-    // user login
+    //user login
     public function index()
     {
+        
         return view('login');
     }
 
-    public function login() 
+    public function login()
     {
         helper(['form', 'url']);
         
@@ -30,16 +30,16 @@ class Login extends BaseController
             'username' => 'required',
             'password' => 'required'
         ]);
-
+    
         if ($validation->withRequest($this->request)->run() == FALSE) {
             return view('login', ['validation' => $this->validator]);
         } else {
             $signupModel = new SignupModel();
             $username = $this->request->getVar('username');
             $password = $this->request->getVar('password');
-
+    
             $user = $signupModel->where('username', $username)->first();
-
+    
             if ($user) {
                 // Check if the password matches
                 if (password_verify($password, $user['password'])) {
@@ -54,7 +54,7 @@ class Login extends BaseController
                             'profile_image' => $user['profile_image'],
                             'isLoggedIn' => true
                         ]);
-
+    
                         // Redirect based on user role
                         if ($user['role'] == 'mentor' || $user['role'] == 'passive-investors') {
                             return redirect()->to('/investor');
@@ -77,7 +77,6 @@ class Login extends BaseController
             }
         }
     }
-
     
     
     public function logout()
@@ -86,7 +85,8 @@ class Login extends BaseController
         return redirect()->to('/');
     }
 
-    // investor signup page
+
+    //investor signup page
     public function investor_signup()
     {
         return view('investor_signup');
@@ -119,11 +119,11 @@ class Login extends BaseController
                 'email'              => $this->request->getVar('email'),
                 'password'           => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
                 'role'               => $this->request->getVar('role'),
-                'verify_token' => $verificationToken,
-                'email_verified'     => 0
+                'verify_token' => $verificationToken, // Store token in users table
+                'email_verified'     => 0 // Initially not verified
             ];
 
-            try {
+            try{
                 // Insert into the 'users' table and retrieve the user ID
                 $user_id = $signupModel->insert($userData, true); 
         
@@ -148,7 +148,8 @@ class Login extends BaseController
                     // Redirect to the validation page on success
                     return redirect()->to('validate')->with('success', '<strong style="color: green;">Account created successfully. Please check your email to verify your account.</strong><br><br>');
                 } 
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 // Check if the error is a duplicate entry error
                 if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
                     return redirect()->back()->with('error', '<strong style="color: red;">The email address is already registered. Please use a different email.</strong><br><br>');
