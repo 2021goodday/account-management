@@ -20,7 +20,7 @@ class Login extends BaseController
         return view('login');
     }
 
-    public function login() 
+    public function login()  
     {
         helper(['form', 'url']);
         
@@ -30,42 +30,43 @@ class Login extends BaseController
             'username' => 'required',
             'password' => 'required'
         ]);
-
+    
         if ($validation->withRequest($this->request)->run() == FALSE) {
             return view('login', ['validation' => $this->validator]);
         } else {
             $signupModel = new SignupModel();
             $username = $this->request->getVar('username');
             $password = $this->request->getVar('password');
-
+    
             $user = $signupModel->where('username', $username)->first();
-
+    
             if ($user) {
                 // Check if the password matches
                 if (password_verify($password, $user['password'])) {
-                    // Check if the user is verified
-                    if ($user['email_verified'] == 1) {
-                        // Set session data for the verified user
-                        session()->set([
-                            'user_id' => $user['id'],
-                            'username' => $user['username'],
-                            'email' => $user['email'],
-                            'role' => $user['role'],
-                            'profile_image' => $user['profile_image'],
-                            'isLoggedIn' => true
-                        ]);
-
-                        // Redirect based on user role
-                        if ($user['role'] == 'mentor' || $user['role'] == 'passive-investors') {
-                            return redirect()->to('/investor');
-                        } elseif ($user['role'] == 'Entrepreneurs' || $user['role'] == 'Tech Startup Companies') {
-                            return redirect()->to('/startup');
-                        } else {
-                            return redirect()->to('validate');
-                        }
+                    // Only attempt to reactivate if the user is deactivated
+                    if (isset($user['deactivated']) && $user['deactivated'] == 1) {
+                        // Reactivate account directly using raw SQL
+                        $db = \Config\Database::connect();
+                        $db->query("UPDATE users SET deactivated = 0 WHERE id = ?", [$user['id']]);
+                    }
+    
+                    // Set session data
+                    session()->set([
+                        'user_id' => $user['id'],
+                        'username' => $user['username'],
+                        'email' => $user['email'],
+                        'role' => $user['role'],
+                        'profile_image' => $user['profile_image'],
+                        'isLoggedIn' => true
+                    ]);
+    
+                    // Redirect based on user role
+                    if ($user['role'] == 'mentor' || $user['role'] == 'passive-investors') {
+                        return redirect()->to('/investor');
+                    } elseif ($user['role'] == 'Entrepreneurs' || $user['role'] == 'Tech Startup Companies') {
+                        return redirect()->to('/startup');
                     } else {
-                        // If user is not verified, redirect with an error message
-                        return redirect()->back()->with('error', '<strong style="color: red;">Your email is not yet verified. Please check your Gmail inbox account.</strong><br><br>');
+                        return redirect()->to('validate');
                     }
                 } else {
                     // Incorrect password
@@ -77,7 +78,6 @@ class Login extends BaseController
             }
         }
     }
-
     
     
     public function logout()
@@ -514,12 +514,3 @@ class Login extends BaseController
     }
     
 }
-
-
-
-
-
-
-
-
-
