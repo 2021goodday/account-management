@@ -108,8 +108,11 @@ $routes->get('adminprof', 'AdminProf::index');
 // Admin management
 $routes->get('adminacc', 'AdminAcc::index');
 
-// [adrielle] Form submission route for Account Management
+// adrielle - Form submission route for Account Management
 $routes->post('user/updateAccount', 'AdminAcc::updateAccount');
+
+// adrielle - Account Deactivation in Account Management
+$routes->post('user/deactivateAccount', 'AdminAcc::deactivateAccount');
 
 // Admin startup account management 
 $routes->get('adminSAV', 'AdminSAV::index');
