@@ -184,15 +184,18 @@
         </form>
 
         <!-- Deactivation Confirmation Modal -->
-        <div id="deactivateModal">
-            <div class="modal-content">
-                <h4>Confirm Account Deactivation</h4>
-                <p>Please enter your password to confirm deactivation.</p>
-                <input type="password" id="confirmPassword" required>
-                <button onclick="submitDeactivationForm()" class="danger-button">Confirm</button>
-                <button type="button" onclick="closeModal()">Cancel</button>
-            </div>
+<div id="deactivateModal">
+    <div class="modal-content">
+        <h4>Confirm Account Deactivation</h4>
+        <p>Please enter your password to confirm deactivation.</p>
+        <input type="password" id="confirmPassword" required style="margin-bottom: 15px;">
+        <div style="display: flex; gap: 45px; justify-content: center;">
+            <button onclick="submitDeactivationForm()" class="danger-button">Confirm</button>
+            <button type="button" onclick="closeModal()">Cancel</button>
         </div>
+    </div>
+</div>
+
     </div>
 </div>
 
